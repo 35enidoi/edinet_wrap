@@ -62,7 +62,11 @@ class Edinet:
     def get_document_list(self,
                           date: datetime.datetime,
                           type_: Literal[1, 2] = 1) -> Union[GetDocumentResponse, GetDocumentResponseWithDocs]:
-        """<仕様よくわからんのでここに説明書いといて>"""
+        """
+        `documents.json`エンドポイントのラッパー
+        date: `datetime.datetime`オブジェクト
+        type_: 1か2の値、デフォルト値は1
+        """
         if isinstance(date, datetime.datetime) and type_ in (1, 2):  # 引数があっているか確認
 
             params = {
@@ -81,6 +85,11 @@ class Edinet:
     def get_document(self,
                      docId: str,
                      type_: Literal[1, 2, 3, 4, 5]) -> bytes:
+        """
+        `documents/{docId}`エンドポイントのラッパー
+        docId: ドキュメントのID
+        type_: 1~5の値。それぞれ何に対応するかはAPI仕様書を参考にしてください
+        """
         if type_ in (1, 2, 3, 4, 5):
 
             params = {
