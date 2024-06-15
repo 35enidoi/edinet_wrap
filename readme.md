@@ -22,7 +22,7 @@ documents_class_by_filer: dict[str, list[tuple[str, str, str]]] = {}
 
 for i in doc_list["results"]:
     # 縦覧できる事を確認
-    if i["legalStatus"] != 0:
+    if i["legalStatus"] != "0":
         # もし変数の中に登録されてない場合、作成。
         if not documents_class_by_filer_name.get(i["filerName"]):
             documents_class_by_filer_name[i["filerName"]] = []
