@@ -14,7 +14,7 @@ API_TOKEN = "your token here"
 edn = Edinet(API_TOKEN)
 
 # ドキュメントを取得
-doc_list = edn.get_document_list(datetime.today(), type_=2)
+doc_list = edn.get_document_list(datetime.today(), withdocs=True)
 
 # 会社別の提出書のリスト
 # 提出書の種類、EDINET ID、証券コード
@@ -24,10 +24,10 @@ for i in doc_list["results"]:
     # 縦覧できる事を確認
     if i["legalStatus"] != "0":
         # もし変数の中に登録されてない場合、作成。
-        if not documents_class_by_filer_name.get(i["filerName"]):
-            documents_class_by_filer_name[i["filerName"]] = []
+        if not documents_class_by_filer.get(i["filerName"]):
+            documents_class_by_filer[i["filerName"]] = []
         # 追加
-        documents_class_by_filer_name[i["filerName"]].append((
+        documents_class_by_filer[i["filerName"]].append((
             i["docDescription"],
             i["docID"],
             i["secCode"]
@@ -35,7 +35,7 @@ for i in doc_list["results"]:
 
 # 保存する
 with open("documents.json", "w", encoding="utf-8") as f:
-    f.write(json.dumps(documents_class_by_filer_name,
+    f.write(json.dumps(documents_class_by_filer,
                        indent=4,
                        ensure_ascii=False))
 

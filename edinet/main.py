@@ -21,9 +21,17 @@ __all__ = ["Edinet"]
 class Edinet:
     def __init__(self, token: str) -> None:
         """
-        `token: str`
-         APIのキー
+        Edinet APIのラッパー
+
+        Parameters
+        ----------
+        token: str
+            APIのキー
         """
+        # 引数の型チェック
+        if not isinstance(token, str):
+            raise ValueError()
+
         # EDINET APIのバージョン(今のところ2しかないけど)
         EDINET_API_VERSION = 2
         # apiの保存
@@ -53,25 +61,30 @@ class Edinet:
             raise ResponseNot200(res.status_code, res.text)
 
     @overload
-    def get_document_list(self, date: datetime.datetime, type_: Literal[1]) -> GetDocumentResponse: ...
+    def get_document_list(self, date: datetime.datetime, withdocs: False) -> GetDocumentResponse: ...
     @overload
-    def get_document_list(self, date: datetime.datetime, type_: Literal[2]) -> GetDocumentResponseWithDocs: ...
+    def get_document_list(self, date: datetime.datetime, withdocs: True) -> GetDocumentResponseWithDocs: ...
     @overload
     def get_document_list(self, date: datetime.datetime) -> GetDocumentResponse: ...
 
     def get_document_list(self,
                           date: datetime.datetime,
-                          type_: Literal[1, 2] = 1) -> Union[GetDocumentResponse, GetDocumentResponseWithDocs]:
+                          withdocs: bool = False) -> Union[GetDocumentResponse, GetDocumentResponseWithDocs]:
         """
         `documents.json`エンドポイントのラッパー
-        date: `datetime.datetime`オブジェクト
-        type_: 1か2の値、デフォルト値は1
+
+        Parameters
+        ----------
+        date: datetime.datetime
+            `datetime.datetime`オブジェクト、年月日の指定。
+        withdocs: :obj:`bool`, default False
+            提出書類一覧を含めるか、デフォルトは含めない。
         """
-        if isinstance(date, datetime.datetime) and type_ in (1, 2):  # 引数があっているか確認
+        if isinstance(date, datetime.datetime) and isinstance(withdocs, bool):  # 引数があっているか確認
 
             params = {
                 "date": date.strftime("%Y-%m-%d"),
-                "type": type_
+                "type": (withdocs + 1)  # boolはintのサブクラス
             }
 
             response = self.__request(endpoint="documents.json",
@@ -84,16 +97,25 @@ class Edinet:
 
     def get_document(self,
                      docId: str,
-                     type_: Literal[1, 2, 3, 4, 5]) -> bytes:
+                     type: Literal[1, 2, 3, 4, 5]) -> bytes:
         """
-        `documents/{docId}`エンドポイントのラッパー
-        docId: ドキュメントのID
-        type_: 1~5の値。それぞれ何に対応するかはAPI仕様書を参考にしてください
+        ドキュメントの取得
+
+        Parameters
+        ----------
+        docId: str
+            書類管理番号
+        type: Literal[1, 2, 3, 4, 5]
+            - 1: 提出本文書及び監査報告書、XBRLを取得
+            - 2: PDFを取得
+            - 3: 代替書面・添付文書を取得
+            - 4: 英文ファイルを取得
+            - 5: CSVを取得
         """
-        if type_ in (1, 2, 3, 4, 5):
+        if isinstance(docId, str) and type in (1, 2, 3, 4, 5):
 
             params = {
-                "type": type_
+                "type": type
             }
 
             response = self.__request(endpoint=f"documents/{docId}",
