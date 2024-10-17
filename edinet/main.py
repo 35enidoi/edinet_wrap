@@ -28,6 +28,10 @@ class Edinet:
         token: str
             APIのキー
         """
+        # 引数の型チェック
+        if not isinstance(token, str):
+            raise ValueError()
+
         # EDINET APIのバージョン(今のところ2しかないけど)
         EDINET_API_VERSION = 2
         # apiの保存
@@ -108,7 +112,7 @@ class Edinet:
             - 4: 英文ファイルを取得
             - 5: CSVを取得
         """
-        if type in (1, 2, 3, 4, 5):
+        if isinstance(docId, str) and type in (1, 2, 3, 4, 5):
 
             params = {
                 "type": type
