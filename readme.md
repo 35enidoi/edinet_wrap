@@ -14,7 +14,7 @@ API_TOKEN = "your token here"
 edn = Edinet(API_TOKEN)
 
 # ドキュメントを取得
-doc_list = edn.get_document_list(datetime.today(), type_=2)
+doc_list = edn.get_document_list(datetime.today(), withdocs=True)
 
 # 会社別の提出書のリスト
 # 提出書の種類、EDINET ID、証券コード
